@@ -74,7 +74,7 @@ const displayMovements = function (movements, sort = false) {
       <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-      <div class="movements__value">${mov}€</div>
+      <div class="movements__value">${Math.abs(mov)}€</div>
     </div>
     `;
 
@@ -155,7 +155,7 @@ const withdrawals = movements.filter(function (mov) {
 });
 
 // Event Handler
-let currentAccount;
+let currentAccount, timer;
 
 btnLogin.addEventListener('click', function (e) {
   // prevent default submission of button in form html tag
@@ -179,6 +179,10 @@ btnLogin.addEventListener('click', function (e) {
     // Clear input fields
     inputLoginPin.value = inputLoginUsername.value = '';
     inputLoginPin.blur();
+
+    if (timer) clearInterval(timer);
+
+    timer = startLogoutTimer();
   }
 });
 
@@ -200,6 +204,10 @@ btnTransfer.addEventListener('click', function (e) {
 
     // Update UI
     updateUI(currentAccount);
+
+    // reset timer
+    clearInterval(timer);
+    timer = startLogoutTimer();
   }
 });
 
@@ -233,6 +241,10 @@ btnLoan.addEventListener('click', function (e) {
       updateUI(currentAccount);
 
       inputLoanAmount.value = '';
+
+      // reset timer
+      clearInterval(timer);
+      timer = startLogoutTimer();
     }
   }
 });
@@ -254,3 +266,28 @@ const max = movements.reduce(function (acc, mov) {
     return mov;
   }
 }, 0);
+
+const startLogoutTimer = function () {
+  const tick = function () {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+
+    const sec = String(time % 60).padStart(2, 0);
+    labelTimer.textContent = `${min}:${sec}`;
+
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = `Log in to get started`;
+      containerApp.style.opacity = 0;
+    }
+
+    // Decrease timer
+    time--;
+  };
+
+  let time = 300;
+
+  tick();
+
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
