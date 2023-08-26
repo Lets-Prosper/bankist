@@ -1,0 +1,2 @@
+# bankist
+Bank simulator project
